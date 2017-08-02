@@ -5,9 +5,8 @@
                     [\- \- \-]])
 
 (def board-state (atom {:board initial-board
-                        :turn "X"
+                        :turn \X
                         :game-state :in-progress}))
-
 
 ;----------Printing at Terminal---------
 
@@ -35,3 +34,14 @@
 
 ;---------------------
 
+(defn board-pos-after-move [current-board [row column]]
+  (-> current-board
+    (assoc-in [row column] (:turn @board-state))))
+
+(defn make-move [move-position]
+  (let [next-pos (board-pos-after-move (:board @board-state) move-position)]
+    (swap! board-state assoc :board next-pos))
+  (swap! board-state assoc :turn ({\X \O \0 \X} (:turn @board-state)))
+  (console-print (:board @board-state)))
+
+;-----------------
