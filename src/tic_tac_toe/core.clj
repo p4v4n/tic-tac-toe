@@ -13,7 +13,7 @@
 
 (defn read-and-process-move [move-str]
   (let [move-index (translate-move move-str)]
-  (println "dummy body")))
+  (board/make-move move-index)))
 
 (defn game-play []
   (while true
