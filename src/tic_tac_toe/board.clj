@@ -52,13 +52,23 @@
 (defn left-diagonal [board-vec]
   (->> board-vec
        (#(map vector % (range)))
-       (map #(apply nth %))))
+       (mapv #(apply nth %))))
 
 (defn right-diagonal [board-vec]
   (->> (reverse board-vec)
        (#(map vector % (range)))
-       (map #(apply nth %))))
+       (mapv #(apply nth %))))
 
 (defn list-of-lines [board-vec]
-  (concat board-vec (column-list board-vec)) 
-          (left-diagonal board-vec) (right-diagonal board-vec))
+  (concat board-vec (column-list board-vec) 
+          (vector (left-diagonal board-vec) (right-diagonal board-vec))))
+
+(defn only-one-item? [some-vec]
+  (if (= 1 ((comp count set) some-vec))
+      (first some-vec)))
+
+(defn player-won? [board-vec]
+  (->> (list-of-lines board-vec)
+       (map only-one-item?)
+       (remove nil?)
+       (some #(not= \- %))))
