@@ -16,8 +16,11 @@
   (board/make-move move-index)))
 
 (defn game-play []
+  (board/console-print board/initial-board)
   (while (not (board/game-over? (:board @board/board-state)))
-    (read-and-process-move (read-line))))
+    (println (str (:turn @board/board-state)) "to move:")
+    (read-and-process-move (read-line)))
+  (board/end-of-game-action))
 
 (defn -main []
   (game-play))

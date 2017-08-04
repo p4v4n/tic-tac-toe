@@ -44,7 +44,7 @@
   (swap! board-state assoc :turn ({\X \O \O \X} (:turn @board-state)))
   (console-print (:board @board-state)))
 
-;--------------End of Game-------
+;--------------Checking End of Game-------
 
 (defn column-list [board-vec]
   (apply map vector board-vec))
@@ -80,3 +80,13 @@
 
 (defn game-over? [board-vec]
   (or (player-won? board-vec) (not (any-empty-slot? board-vec))))
+
+;-------End of Game Action-------
+
+(defn end-of-game-action []
+  (let [Winner (if (player-won? (:board @board-state))
+                         ({\X \O \O \X} (:turn @board-state)))]
+    (if somebody-won
+        (swap! board-state assoc :game-state (str Winner " won"))
+        (swap! board-state assoc :game-state "Game ends in draw")))
+  (println (:game-state @board-state)))
