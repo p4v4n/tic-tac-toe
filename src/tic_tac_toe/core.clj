@@ -16,7 +16,7 @@
   (board/make-move move-index)))
 
 (defn game-play []
-  (while true
+  (while (not (board/game-over? (:board @board/board-state)))
     (read-and-process-move (read-line))))
 
 (defn -main []

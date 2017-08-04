@@ -72,3 +72,11 @@
        (map only-one-item?)
        (remove nil?)
        (some #(not= \- %))))
+
+(defn any-empty-slot? [board-vec]
+  (->> board-vec
+       (map #(some #{\-} %))
+       (some #((complement nil?) %))))
+
+(defn game-over? [board-vec]
+  (or (player-won? board-vec) (not (any-empty-slot? board-vec))))
