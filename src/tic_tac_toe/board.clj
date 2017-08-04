@@ -1,21 +1,33 @@
 (ns tic-tac-toe.board
   (require [clojure.string :as string]))
 
-(def initial-board [[\- \- \-]
-                    [\- \- \-]
-                    [\- \- \-]])
-
-(def board-state (atom {:board initial-board
+(def board-state (atom {:board []
+                        :board-size 0
                         :turn \X
                         :game-state :in-progress}))
+
+;---------Update board based on board-size-------
+
+(defn update-board-size [n]
+  (swap! board-state assoc :board-size n)
+  (swap! board-state assoc :board (->> (repeat n \-)
+                                       vec
+                                       (repeat n)
+                                       vec)))
 
 ;----------Printing at Terminal---------
 
 (def char-map {\- " " \X "X" \O "O"})
 
-(def space-line "   |   |   ")
+(defn space-line [board-size]
+  (->> (repeat board-size "   ")
+       (interpose "|")
+       (apply str)))
 
-(def divider-line "---|---|---")
+(defn divider-line [board-size]
+  (->> (repeat board-size "---")
+       (interpose "|")
+       (apply str)))
 
 (defn line-convertor [line-vec]
   (->> line-vec
@@ -27,10 +39,11 @@
 (defn console-print [board-vec]
   (->> board-vec
        (map line-convertor)
-       (interpose divider-line)
+       (interpose (divider-line (count board-vec)))
        (map #(str % "\n"))
        (apply str)
-       (#(str space-line "\n" % space-line "\n"))
+       (#(str (space-line (count board-vec)) "\n" % 
+              (space-line (count board-vec)) "\n"))
        println))
 
 ;--------------Convert Valid user-input to move index---------
@@ -45,13 +58,14 @@
 
 ;------Validity Check--------
 
-(defn is-empty-slot? [move-str]
-  (= \- (->> move-str
-             translate-move
+(defn is-empty-slot? [move-index]
+  (= \- (->> move-index
              (get-in (:board @board-state)))))
 
-(defn is-valid-move? [board-vec move-str]
-  (and (re-matches #"^[a-c][1-3]$" move-str) (is-empty-slot? move-str)))
+(defn is-valid-move? [board-vec move-index]
+  (and (and (<= 0 (first move-index) (dec (:board-size @board-state)))
+            (<= 0 (last move-index) (dec (:board-size @board-state)))) 
+       (is-empty-slot? move-index)))
 
 ;-----------Making a Move-------
 
