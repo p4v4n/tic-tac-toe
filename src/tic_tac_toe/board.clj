@@ -1,19 +1,15 @@
 (ns tic-tac-toe.board
   (require [clojure.string :as string]))
 
-(def board-state (atom {:board []
-                        :board-size 0
-                        :turn \X
-                        :game-state :in-progress}))
+;---------Create board-state based on board-size-------
 
-;---------Update board based on board-size-------
-
-(defn update-board-size [n]
-  (swap! board-state assoc :board-size n)
-  (swap! board-state assoc :board (->> (repeat n \-)
-                                       vec
-                                       (repeat n)
-                                       vec)))
+(defn create-initial-board-state [n] {:board (->> (repeat n \-)
+                                          vec
+                                          (repeat n)
+                                          vec)
+                              :board-size n
+                              :turn \X
+                              :game-state :in-progress})
 
 ;----------Printing at Terminal---------
 
@@ -58,26 +54,14 @@
 
 ;------Validity Check--------
 
-(defn is-empty-slot? [move-index]
+(defn is-empty-slot? [move-index board-vec]
   (= \- (->> move-index
-             (get-in (:board @board-state)))))
+             (get-in board-vec))))
 
 (defn is-valid-move? [board-vec move-index]
-  (and (and (<= 0 (first move-index) (dec (:board-size @board-state)))
-            (<= 0 (last move-index) (dec (:board-size @board-state)))) 
-       (is-empty-slot? move-index)))
-
-;-----------Making a Move-------
-
-(defn board-pos-after-move [current-board [row column]]
-  (-> current-board
-    (assoc-in [row column] (:turn @board-state))))
-
-(defn make-move [move-position]
-  (let [next-pos (board-pos-after-move (:board @board-state) move-position)]
-    (swap! board-state assoc :board next-pos))
-  (swap! board-state assoc :turn ({\X \O \O \X} (:turn @board-state)))
-  (console-print (:board @board-state)))
+  (and (and (<= 0 (first move-index) (dec (count board-vec)))
+            (<= 0 (last move-index) (dec (count board-vec)))) 
+       (is-empty-slot? move-index board-vec)))
 
 ;--------------Checking End of Game-------
 
@@ -116,12 +100,23 @@
 (defn game-over? [board-vec]
   (or (player-won? board-vec) (not (any-empty-slot? board-vec))))
 
+;-----------Making a Move-------
+
+(defn board-pos-after-move [current-board [row column] player-to-move]
+  (-> current-board
+    (assoc-in [row column] player-to-move)))
+
+(defn update-board-state [board-state move-position]
+  (let [next-pos (board-pos-after-move (:board board-state) move-position (:turn board-state))]
+    (-> board-state
+        (assoc :board next-pos)
+        (assoc :turn ({\X \O \O \X} (:turn board-state))))))
+
 ;-------End of Game Action-------
 
-(defn end-of-game-action []
-  (let [Winner (if (player-won? (:board @board-state))
-                         ({\X \O \O \X} (:turn @board-state)))]
-    (if Winner
-        (swap! board-state assoc :game-state (str "Player-" Winner " won"))
-        (swap! board-state assoc :game-state "Game ends in draw")))
-  (println (:game-state @board-state)))
+(defn end-of-game-action [board-state]
+  (let [winner (if (player-won? (:board board-state))
+                         ({\X \O \O \X} (:turn board-state)))]
+    (if winner
+        (println (str "Player-" winner " won"))
+        (println "Game ends in draw"))))
