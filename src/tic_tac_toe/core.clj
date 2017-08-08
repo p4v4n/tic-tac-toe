@@ -12,7 +12,7 @@
             board-state))))
 
 (defn engine-moves [board-state]
-  (let [engine-move-pick (ai/engine-choice board-state)]
+  (let [engine-move-pick (ai/engine-choice2 board-state)]
     (Thread/sleep 1000)
     (board/update-board-state board-state engine-move-pick)))
 
