@@ -28,13 +28,6 @@
            (apply (if (= \X (:turn board-state))
                        max
                        min)))))
-
-(println (evaluation-at-depth {:board [[\X \O \X]
-                                       [\X \O \O]
-                                       [\- \- \-]]
-                              :board-size 3
-                              :turn \X
-                              :game-state :in-progress}))
   
 ;-----------Pick a Move
 
