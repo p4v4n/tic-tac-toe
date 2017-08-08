@@ -112,11 +112,17 @@
         (assoc :board next-pos)
         (assoc :turn ({\X \O \O \X} (:turn board-state))))))
 
+;------------Winner-----
+
+(defn winner [board-state]
+  (if (player-won? (:board board-state))
+      ({\X \O \O \X} (:turn board-state))
+      \-))
+
 ;-------End of Game Action-------
 
 (defn end-of-game-action [board-state]
-  (let [winner (if (player-won? (:board board-state))
-                         ({\X \O \O \X} (:turn board-state)))]
-    (if winner
-        (println (str "Player-" winner " won"))
+  (let [who-won (winner board-state)]
+    (if (not= who-won \-)
+        (println (str "Player-" who-won " won"))
         (println "Game ends in draw"))))
